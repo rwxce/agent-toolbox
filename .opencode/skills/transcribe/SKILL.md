@@ -49,7 +49,9 @@ original a la Paperera de macOS.
    `{src, status, text, language, duration, trashed}` (o `error`). El progrés
    va a stderr.
 5. **Respon** amb el **text sencer** al xat, en paràgrafs llegibles (no
-   n'inventis ni en corregeixis el contingut), precedit de la durada. Digues que
+   n'inventis ni en corregeixis el contingut), precedit de la durada. Posa la
+   transcripció **dins d'un bloc de codi** (tanca amb ```text) perquè es pugui
+   copiar d'un clic; res de la transcripció fora del bloc. Digues que
    l'original és a la Paperera. Si hi ha `error`, explica'l: l'original no
    s'ha esborrat.
 6. **Resum** (només si l'usuari l'ha demanat): després del text sencer, afegeix
