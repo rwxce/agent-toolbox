@@ -7,4 +7,4 @@ Transcriu el(s) fitxer(s) següent(s) seguint la skill `transcribe`:
 
 $ARGUMENTS
 
-Si no hi ha cap fitxer als arguments ni adjunt al missatge, pregunta quin fitxer vol transcriure. Opcions que l'usuari pot afegir en text lliure: idioma (ca/es/en), model (tiny…large-v3), format (txt, srt) i si vol també l'mp3.
+Si no hi ha cap fitxer als arguments ni adjunt al missatge, pregunta quin fitxer vol transcriure. Abans de transcriure, fes les preguntes de la skill (idioma, qualitat, context), excepte les que l'usuari ja hagi respost als arguments. Al final, dona el text sencer al xat sense desar cap fitxer i envia l'original a la Paperera.

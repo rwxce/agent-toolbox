@@ -5,38 +5,53 @@ description: Transcriu àudio o vídeo a text en local amb faster-whisper (sense
 # Transcriure àudio/vídeo
 
 Script: `scripts/transcribe.py` (dins d'aquesta carpeta de skill). S'executa amb
-`uv run`, que instal·la les dependències automàticament (PEP 723). No cal
-convertir a mp3: faster-whisper llegeix m4a/mp4/ogg/wav... directament.
+`uv run`, que instal·la les dependències automàticament (PEP 723).
+
+Resultat esperat: **el text final al xat, sense deixar cap fitxer**, i l'àudio
+original a la Paperera de macOS.
 
 ## Passos
 
-1. **Resol els fitxers**: rutes que doni l'usuari o adjunts. Posa sempre les
-   rutes entre cometes (sovint tenen espais i accents). Si diu "l'últim àudio
-   de Downloads", busca el més recent amb `ls -t`.
-2. **Executa** (en segon pla si l'àudio dura més de ~5 min; el model `medium`
-   va aproximadament a temps real o més ràpid en CPU):
+1. **Resol el fitxer**: ruta que doni l'usuari o adjunt. Posa sempre les rutes
+   entre cometes (sovint tenen espais i accents).
+2. **Pregunta abans de transcriure**, totes les preguntes de cop (amb l'eina de
+   preguntes si n'hi ha; si no, en un sol missatge). No tornis a preguntar el
+   que l'usuari ja hagi dit.
+   - **Idioma**: Català (`ca`) / Castellà (`es`) / Barreja català-castellà
+     (`multi`) / Anglès (`en`).
+   - **Qualitat**: `medium` (per defecte) / `large-v3` (més precís, més lent) /
+     `small` (més ràpid).
+   - **Context** (opcional): noms de persones, empreses, sigles, tema. Millora
+     molt l'ortografia dels noms propis.
+3. **Executa** (en segon pla si l'àudio és llarg; `medium` en CPU va
+   aproximadament a temps real):
 
    ```bash
-   uv run "<carpeta d'aquesta skill>/scripts/transcribe.py" "<fitxer>" [més fitxers o carpetes] \
-     [--lang auto|ca|es|en] [--model tiny|base|small|medium|large-v3] \
-     [--format txt,srt] [--out <carpeta>] [--to-mp3]
+   uv run "<carpeta d'aquesta skill>/scripts/transcribe.py" "<fitxer>" \
+     --print --trash-source --lang <ca|es|multi|en> --model <model> \
+     [--prompt "<context>"]
    ```
 
-   - Per defecte: `--model medium --lang auto --format txt`, sortida al costat
-     de l'original (`nom.txt`; si ja existeix, `nom (1).txt`).
-   - Si l'usuari indica l'idioma, passa `--lang`; millora la precisió.
-   - `--model large-v3` si demana màxima qualitat; `small` si té pressa.
-   - El primer cop es descarrega el model (~1.5 GB per `medium`) a
-     `~/.cache/huggingface`. Avisa'n.
-   - Si l'usuari vol l'mp3, afegeix `--to-mp3` (requereix `ffmpeg`).
-3. **Llegeix el resultat**: cada línia de stdout és un JSON
-   `{src, outputs, status, language, duration}` (o `error`). El progrés va a
-   stderr.
-4. **Informa**: ruta(es) de sortida, idioma detectat i durada, i un fragment
-   inicial del text (no l'enganxis sencer). Ofereix fer-ne un resum, actes o
-   llista de tasques si té sentit.
+   - `--print`: no escriu cap fitxer; el text arriba al JSON de stdout.
+   - `--trash-source`: si ha anat bé, l'original va a la Paperera (i la carpeta
+     de l'adjunt s'esborra si queda buida).
+   - Si cal convertir el fitxer, l'script ho fa en una carpeta temporal que
+     s'esborra sola.
+   - El primer cop es descarrega el model a `~/.cache/huggingface`. Avisa'n.
+4. **Llegeix el resultat**: una línia JSON per fitxer
+   `{src, status, text, language, duration, trashed}` (o `error`). El progrés
+   va a stderr.
+5. **Respon** amb el **text sencer** al xat, en paràgrafs llegibles (no
+   n'inventis ni en corregeixis el contingut), precedit de la durada. Digues que
+   l'original és a la Paperera. Si hi ha `error`, explica'l: l'original no
+   s'ha esborrat.
+
+## Ús manual (sense agent)
+
+Sense `--print`, desa `.txt`/`.srt` al costat de l'original (`--format txt,srt`,
+`--out <carpeta>`); `--to-mp3` desa també una còpia en mp3 (requereix `ffmpeg`).
 
 ## Errors habituals
 
 - `uv` no trobat → `brew install uv`.
-- `ffmpeg` no trobat (només amb `--to-mp3`) → `brew install ffmpeg`.
+- `ffmpeg` no trobat → `brew install ffmpeg`.

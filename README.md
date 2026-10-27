@@ -20,7 +20,8 @@ Requisits: `node` (per `npx`), [`uv`](https://docs.astral.sh/uv/) (`brew install
 Ús directe sense agent:
 
 ```bash
-uv run .rulesync/skills/transcribe/scripts/transcribe.py "reunio.m4a" --lang ca --format txt,srt
+uv run .rulesync/skills/transcribe/scripts/transcribe.py "reunio.m4a" --lang multi --prompt "Sara, Jordi" --print   # text a stdout, sense fitxers
+uv run .rulesync/skills/transcribe/scripts/transcribe.py "reunio.m4a" --lang ca --format txt,srt     # desa .txt i .srt
 ```
 
 ## Afegir una eina nova
