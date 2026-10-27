@@ -28,6 +28,8 @@ original a la Paperera de macOS.
      `small` (més ràpid).
    - **Context** (opcional): noms de persones, empreses, sigles, tema. Millora
      molt l'ortografia dels noms propis.
+   - **Format de sortida**: Només transcripció (per defecte) / Transcripció +
+     resum (amb diagrames i accions).
 3. **Executa** (en segon pla si l'àudio és llarg; `medium` en CPU va
    aproximadament a temps real):
 
@@ -50,6 +52,18 @@ original a la Paperera de macOS.
    n'inventis ni en corregeixis el contingut), precedit de la durada. Digues que
    l'original és a la Paperera. Si hi ha `error`, explica'l: l'original no
    s'ha esborrat.
+6. **Resum** (només si l'usuari l'ha demanat): després del text sencer, afegeix
+   una secció `## Resum`, concisa però ben explicada, pensada per saber què cal
+   fer. Basa't només en el que diu l'àudio; no inventis res.
+   - **De què va**: 1-2 frases.
+   - **Punts clau**: llista curta.
+   - **Diagrama**: Mermaid `flowchart LR` de 3-6 caixes amb el flux, procés o
+     decisions principals. Etiquetes en llenguatge planer (sense jerga), amb una
+     nota curta amb `<br/>` només on importi. Si cal detall entre actors, un
+     `sequenceDiagram` de 3-4 missatges com a màxim. Si no hi ha cap flux a
+     dibuixar, una línia que ho expliqui en lloc d'un diagrama buit.
+   - **Què cal fer**: llista ordenada d'accions concretes, amb responsable i
+     termini si es mencionen.
 
 ## Ús manual (sense agent)
 
