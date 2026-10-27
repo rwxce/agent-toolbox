@@ -28,8 +28,6 @@ original a la Paperera de macOS.
      `small` (més ràpid).
    - **Context** (opcional): noms de persones, empreses, sigles, tema. Millora
      molt l'ortografia dels noms propis.
-   - **Format de sortida**: Només transcripció (per defecte) / Transcripció +
-     resum (amb diagrames i accions).
 3. **Executa** (en segon pla si l'àudio és llarg; `medium` en CPU va
    aproximadament a temps real):
 
@@ -54,7 +52,7 @@ original a la Paperera de macOS.
    copiar d'un clic; res de la transcripció fora del bloc. Digues que
    l'original és a la Paperera. Si hi ha `error`, explica'l: l'original no
    s'ha esborrat.
-6. **Resum** (només si l'usuari l'ha demanat): després del text sencer, afegeix
+6. **Resum** (sempre): després del text sencer, afegeix
    una secció `## Resum`, concisa però ben explicada, pensada per saber què cal
    fer. Basa't només en el que diu l'àudio; no inventis res.
    - **De què va**: 1-2 frases.
