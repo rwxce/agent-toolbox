@@ -22,7 +22,7 @@ Font única de configuració per a agents (Claude Code, Codex, OpenCode, Cursor)
 - Idioma: català (codi amb noms en anglès, comentaris i textos en català).
 - Scripts Python: un sol fitxer amb dependències inline (PEP 723), executat amb `uv run`. Res de venv manual.
 - Scripts no interactius: arguments CLI, progrés a stderr, resultat llegible per màquina (JSON) a stdout.
-- Si l'usuari adjunta un fitxer d'àudio/vídeo sense cap altra instrucció, transcriu-lo amb la skill `transcribe`: pregunta idioma, qualitat i context; dona el text al xat sense desar fitxers; l'original va a la Paperera.
+- Si l'usuari adjunta un fitxer d'àudio/vídeo sense cap altra instrucció, transcriu-lo amb la skill `transcribe`: pregunta idioma, qualitat i context; dona el text al xat i el resum (diagrama i accions) sense desar fitxers; l'original va a la Paperera.
 
 ## Git
 
