@@ -1,0 +1,7 @@
+{
+  "$schema": "https://github.com/dyoshikawa/rulesync/releases/latest/download/config-schema.json",
+  "targets": ["claudecode", "codexcli", "opencode", "cursor"],
+  "features": ["rules", "commands", "subagents", "skills"],
+  "outputRoots": ["."],
+  "delete": true
+}
