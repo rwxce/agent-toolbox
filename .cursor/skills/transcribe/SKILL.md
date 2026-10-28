@@ -1,6 +1,6 @@
 ---
 name: transcribe
-description: Transcriu àudio o vídeo a text en local amb faster-whisper (sense API). Usa-la quan l'usuari demani transcriure, "passar a text", treure el text d'una reunió, nota de veu, podcast o vídeo, I TAMBÉ quan adjunti o enganxi directament un fitxer .m4a/.mp3/.mp4/.ogg/.opus/.wav/.webm/.mov sense cap altra instrucció (p. ex. un adjunt a .context/attachments/...).
+description: 'Transcriu àudio o vídeo a text en local amb faster-whisper (sense API). Usa-la quan l''usuari demani transcriure, "passar a text", treure el text d''una reunió, nota de veu, podcast o vídeo, I TAMBÉ quan adjunti o enganxi directament un fitxer .m4a/.mp3/.mp4/.ogg/.opus/.wav/.webm/.mov sense cap altra instrucció (p. ex. un adjunt a .context/attachments/...). També transcriu enllaços de xarxes socials (Instagram, X/Twitter, YouTube): baixa l''àudio en temporal amb la skill `download` i l''esborra en acabar.'
 ---
 # Transcriure àudio/vídeo
 
@@ -8,12 +8,26 @@ Script: `scripts/transcribe.py` (dins d'aquesta carpeta de skill). S'executa amb
 `uv run`, que instal·la les dependències automàticament (PEP 723).
 
 Resultat esperat: **el text final al xat, sense deixar cap fitxer**, i l'àudio
-original a la Paperera de macOS.
+original a la Paperera de macOS (o, si era un enllaç, la descàrrega temporal
+esborrada).
 
 ## Passos
 
 1. **Resol el fitxer**: ruta que doni l'usuari o adjunt. Posa sempre les rutes
    entre cometes (sovint tenen espais i accents).
+   - **Si és un enllaç** de xarxes socials, baixa només l'àudio a una carpeta
+     temporal amb l'script de la skill `download` (germana d'aquesta):
+
+     ```bash
+     tmp=$(mktemp -d)
+     uv run "<carpeta de skills>/download/scripts/download.py" "<url>" \
+       --audio-only --out "$tmp"
+     ```
+
+     Fes servir el `path` del JSON com a fitxer i ofereix el `uploader` i el
+     `title` com a context. Sense `--trash-source`: en acabar (també si falla),
+     esborra la carpeta amb `rm -rf "$tmp"`. Si la descàrrega dona `error`,
+     explica'l i atura't.
 2. **Pregunta abans de transcriure**, totes les preguntes de cop (amb l'eina de
    preguntes si n'hi ha; si no, en un sol missatge). No tornis a preguntar el
    que l'usuari ja hagi dit.
@@ -45,7 +59,8 @@ original a la Paperera de macOS.
    n'inventis ni en corregeixis el contingut), precedit de la durada. Posa la
    transcripció **dins d'un bloc de codi** (tanca amb ```text) perquè es pugui
    copiar d'un clic; res de la transcripció fora del bloc. Digues que
-   l'original és a la Paperera. Si hi ha `error`, explica'l: l'original no
+   l'original és a la Paperera (o, si era un enllaç, que la descàrrega
+   temporal s'ha esborrat). Si hi ha `error`, explica'l: l'original no
    s'ha esborrat.
 6. **Resum** (sempre): després del text sencer, afegeix
    una secció `## Resum`, concisa però ben explicada, pensada per saber què cal

@@ -23,6 +23,7 @@ Font única de configuració per a agents (Claude Code, Codex, OpenCode, Cursor)
 - Scripts Python: un sol fitxer amb dependències inline (PEP 723), executat amb `uv run`. Res de venv manual.
 - Scripts no interactius: arguments CLI, progrés a stderr, resultat llegible per màquina (JSON) a stdout.
 - Si l'usuari adjunta un fitxer d'àudio/vídeo sense cap altra instrucció, transcriu-lo amb la skill `transcribe`: pregunta idioma, qualitat i context; dona el text al xat i el resum (diagrama i accions) sense desar fitxers; l'original va a la Paperera.
+- Si l'usuari enganxa un enllaç de xarxes socials (Instagram, X/Twitter, YouTube) sense cap altra instrucció, pregunta si el vol descarregar (skill `download`, a `~/Downloads`) o transcriure (skill `transcribe`, descàrrega temporal).
 
 ## Git
 
