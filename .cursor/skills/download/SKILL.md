@@ -1,49 +1,48 @@
 ---
 name: download
-description: Descarrega vídeos públics de xarxes socials (Instagram, X/Twitter, YouTube) a ~/Downloads amb yt-dlp, sense iniciar sessió. Usa-la quan l'usuari enganxi un enllaç d'una xarxa social i vulgui el vídeo ("descarrega", "baixa", "guarda el vídeo"). Per transcriure un enllaç, usa la skill `transcribe`.
+description: Downloads public social media videos (Instagram, X/Twitter, YouTube) to ~/Downloads with yt-dlp, without logging in. Use it when the user pastes a social media link and wants the video ("download", "save the video", "descarrega", "baixa", "guarda el vídeo"). To transcribe a link, use the `transcribe` skill.
 ---
-# Descarregar vídeos de xarxes socials
+# Download social media videos
 
-Script: `scripts/download.py` (dins d'aquesta carpeta de skill). S'executa amb
-`uv run`, que instal·la `yt-dlp` automàticament (PEP 723). Sense cookies ni
-sessions: només contingut públic.
+Script: `scripts/download.py` (inside this skill folder). Run it with `uv run`,
+which installs `yt-dlp` automatically (PEP 723). No cookies or sessions: public
+content only.
 
-## Plataformes suportades
+## Supported platforms
 
 - Instagram (`instagram.com`: reels, posts)
 - X/Twitter (`x.com`, `twitter.com`)
 - YouTube (`youtube.com`, `youtu.be`, shorts)
 
-## Passos
+## Steps
 
-1. **Resol l'URL** (o URLs) del missatge. Posa-les sempre entre cometes. No
-   cal netejar-les: l'script treu els paràmetres de seguiment (`?psln=`,
-   `?igsh=`, `?si=`...).
-2. **Executa**:
+1. **Resolve the URL(s)** from the message. Always quote them. No need to clean
+   them: the script strips tracking parameters (`?psln=`, `?igsh=`, `?si=`...).
+2. **Run**:
 
    ```bash
-   uv run "<carpeta d'aquesta skill>/scripts/download.py" "<url>" [--out <carpeta>]
+   uv run "<this skill's folder>/scripts/download.py" "<url>" [--out <folder>]
    ```
 
-   - Per defecte desa el vídeo en mp4 a `~/Downloads`.
-   - `--audio-only`: només l'àudio, sense recodificar (és el que fa servir
-     `transcribe` amb un URL).
-3. **Llegeix el resultat**: una línia JSON per URL
-   `{url, platform, status, path, title, uploader, duration}` (o `error`). El
-   progrés va a stderr.
-4. **Respon** amb la plataforma, l'autor, el títol i la ruta del fitxer. Si hi
-   ha `error`, explica'l (plataforma no suportada, contingut privat o que
-   demana sessió, publicació sense vídeo...).
+   - By default it saves the video as mp4 in `~/Downloads`.
+   - `--audio-only`: audio only, without re-encoding (this is what `transcribe`
+     uses for a URL).
+3. **Read the result**: one JSON line per URL
+   `{url, platform, status, path, title, uploader, duration}` (or `error`).
+   Progress goes to stderr.
+4. **Reply** (in Catalan) with the platform, author, title and file path. If
+   there is an `error`, explain it (unsupported platform, private or
+   login-only content, post without video...).
 
-## Afegir una xarxa
+## Adding a platform
 
-1. Afegeix el domini a `PLATFORMS` de `scripts/download.py` (`"tiktok.com": "TikTok"`).
-2. Afegeix-la a la llista de plataformes suportades d'aquí i a la `description`.
-3. Prova-ho amb un enllaç real (yt-dlp suporta la majoria de xarxes).
+1. Add the domain to `PLATFORMS` in `scripts/download.py` (`"tiktok.com": "TikTok"`).
+2. Add it to the supported platforms list here and to the `description`.
+3. Test it with a real link (yt-dlp supports most platforms).
 
-## Errors habituals
+## Common errors
 
-- `uv` no trobat → `brew install uv`.
-- `ffmpeg` no trobat (cal per ajuntar vídeo i àudio) → `brew install ffmpeg`.
-- Falla una plataforma que abans anava → yt-dlp s'actualitza sovint:
-  `uv cache clean yt-dlp` i torna-ho a provar.
+- `uv` not found → `brew install uv`.
+- `ffmpeg` not found (needed to merge video and audio) → `brew install ffmpeg`.
+- A platform that used to work fails → yt-dlp updates often:
+  `uv cache clean yt-dlp` and try again.

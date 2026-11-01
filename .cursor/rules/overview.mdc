@@ -1,29 +1,30 @@
 ---
-description: 'Repo General: eines, skills, comandes i agents de propòsit general'
+description: 'agent-toolbox: general-purpose tools, skills, commands and agents'
 globs: **/*
 ---
 
-# Repo General
+# agent-toolbox
 
-Font única de configuració per a agents (Claude Code, Codex, OpenCode, Cursor) generada amb [rulesync](https://github.com/dyoshikawa/rulesync). Aquí viuen eines de propòsit general empaquetades com a skills, comandes i subagents.
+Single source of agent configuration (Claude Code, Codex, OpenCode, Cursor) generated with [rulesync](https://github.com/dyoshikawa/rulesync). General-purpose tools live here, packaged as skills, commands and subagents.
 
-## Estructura
+## Structure
 
-- `.rulesync/rules/` — regles (aquest fitxer genera `CLAUDE.md` / `AGENTS.md`).
-- `.rulesync/skills/<nom>/SKILL.md` + `scripts/` — cada eina és una skill amb el seu codi.
-- `.rulesync/commands/<nom>.md` — slash commands (`/<nom>`).
+- `.rulesync/rules/` — rules (this file generates `CLAUDE.md` / `AGENTS.md`).
+- `.rulesync/skills/<name>/SKILL.md` + `scripts/` — each tool is a skill with its own code.
+- `.rulesync/commands/<name>.md` — slash commands (`/<name>`).
 - `.rulesync/subagents/` — subagents.
-- Els fitxers a `.claude/`, `.codex/`, `.opencode/`, `.cursor/`, `CLAUDE.md`, `AGENTS.md` són **generats**: no els editis a mà. Edita `.rulesync/` i executa `npx rulesync generate`.
+- Files in `.claude/`, `.codex/`, `.opencode/`, `.cursor/`, `.agents/`, `CLAUDE.md` and `AGENTS.md` are **generated**: do not edit them by hand. Edit `.rulesync/` and run `npx rulesync generate`.
 
-## Convencions
+## Conventions
 
-- Idioma: català (codi amb noms en anglès, comentaris i textos en català).
-- Scripts Python: un sol fitxer amb dependències inline (PEP 723), executat amb `uv run`. Res de venv manual.
-- Scripts no interactius: arguments CLI, progrés a stderr, resultat llegible per màquina (JSON) a stdout.
-- Si l'usuari adjunta un fitxer d'àudio/vídeo sense cap altra instrucció, transcriu-lo amb la skill `transcribe`: pregunta idioma, qualitat i context; dona el text al xat i el resum (diagrama i accions) sense desar fitxers; l'original va a la Paperera.
-- Si l'usuari enganxa un enllaç de xarxes socials (Instagram, X/Twitter, YouTube) sense cap altra instrucció, pregunta si el vol descarregar (skill `download`, a `~/Downloads`) o transcriure (skill `transcribe`, descàrrega temporal).
+- Language: everything in the repo (code, comments, docs, README, rules, skills, commands) is in English. Talk to the user in Catalan.
+- Python scripts: a single file with inline dependencies (PEP 723), run with `uv run`. No manual venvs.
+- Non-interactive scripts: CLI arguments, progress on stderr, machine-readable result (JSON) on stdout.
+- When a new tool (skill and/or command) is added, update the tools table and usage examples in `README.md` in the same commit.
+- If the user attaches an audio/video file with no other instruction, transcribe it with the `transcribe` skill: ask language, quality and context; give the text in the chat plus the summary (diagram and actions) without saving files; the original goes to the Trash.
+- If the user pastes a social media link (Instagram, X/Twitter, YouTube) with no other instruction, ask whether they want to download it (`download` skill, to `~/Downloads`) or transcribe it (`transcribe` skill, temporary download).
 
 ## Git
 
-- Treballa i fes commit **directament a `main`**: res de branques ni PRs. En acabar una tasca, commit i `git push origin main`.
-- Després de canviar `.rulesync/`, executa `npx rulesync generate` i inclou els fitxers generats al mateix commit.
+- Work and commit **directly on `main`**: no branches or PRs. When a task is done, commit and `git push origin main`.
+- After changing `.rulesync/`, run `npx rulesync generate` and include the generated files in the same commit.

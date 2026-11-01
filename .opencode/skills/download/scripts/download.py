@@ -3,18 +3,18 @@
 # requires-python = ">=3.11"
 # dependencies = ["yt-dlp"]
 # ///
-"""Descarrega vídeos públics de xarxes socials amb yt-dlp (sense iniciar sessió).
+"""Download public social media videos with yt-dlp (no login).
 
-Ús:
+Usage:
     uv run download.py <url>... [--out DIR] [--audio-only]
 
-Per defecte desa el vídeo en mp4 a ~/Downloads. `--audio-only` baixa només la
-pista d'àudio (sense recodificar), pensat per transcriure-la després.
+By default saves the video as mp4 in ~/Downloads. `--audio-only` downloads only
+the audio track (no re-encoding), meant to be transcribed afterwards.
 
-Només s'accepten les plataformes de `PLATFORMS`; per afegir-ne una, afegeix-hi
-el domini. No es fan servir cookies ni sessions: només contingut públic.
+Only the platforms in `PLATFORMS` are accepted; to add one, add its domain.
+No cookies or sessions are used: public content only.
 
-Progrés a stderr; a stdout una línia JSON per URL amb el resultat.
+Progress on stderr; on stdout one JSON line per URL with the result.
 """
 
 from __future__ import annotations
@@ -25,7 +25,7 @@ import sys
 from pathlib import Path
 from urllib.parse import parse_qsl, urlencode, urlsplit, urlunsplit
 
-# Domini → nom de la plataforma. Els subdominis (www., m., mobile.) també valen.
+# Domain → platform name. Subdomains (www., m., mobile.) also match.
 PLATFORMS = {
     "instagram.com": "Instagram",
     "x.com": "X/Twitter",
@@ -33,7 +33,7 @@ PLATFORMS = {
     "youtube.com": "YouTube",
     "youtu.be": "YouTube",
 }
-# Paràmetres de query que cal conservar (la resta són de seguiment: psln, igsh, si...).
+# Query parameters to keep (the rest are tracking: psln, igsh, si...).
 KEEP_PARAMS = {"v"}
 LOGIN_HINTS = ("login", "log in", "sign in", "cookies", "authentication", "private")
 
@@ -51,14 +51,14 @@ def detect_platform(url: str) -> str | None:
 
 
 def clean_url(url: str) -> str:
-    """Treu els paràmetres de seguiment i el fragment de l'URL."""
+    """Strip tracking parameters and the fragment from the URL."""
     parts = urlsplit(url.strip())
     query = urlencode([(k, v) for k, v in parse_qsl(parts.query) if k in KEEP_PARAMS])
     return urlunsplit((parts.scheme or "https", parts.netloc, parts.path, query, ""))
 
 
 class StderrLogger:
-    """Redirigeix els missatges de yt-dlp a stderr perquè stdout quedi net."""
+    """Redirect yt-dlp messages to stderr so stdout stays clean."""
 
     def debug(self, msg: str) -> None:
         if not msg.startswith("[debug]"):
@@ -68,7 +68,7 @@ class StderrLogger:
         log(msg)
 
     def warning(self, msg: str) -> None:
-        log(f"AVÍS: {msg}")
+        log(f"WARNING: {msg}")
 
     def error(self, msg: str) -> None:
         log(msg)
@@ -110,10 +110,10 @@ def download(url: str, out_dir: Path, audio_only: bool) -> dict:
 
 
 def parse_args() -> argparse.Namespace:
-    parser = argparse.ArgumentParser(description="Descarrega vídeos públics de xarxes socials (yt-dlp).")
-    parser.add_argument("urls", nargs="+", help="Enllaços de vídeo")
-    parser.add_argument("--out", default="~/Downloads", help="Carpeta de destí (per defecte ~/Downloads)")
-    parser.add_argument("--audio-only", action="store_true", help="Només l'àudio, per transcriure'l")
+    parser = argparse.ArgumentParser(description="Download public social media videos (yt-dlp).")
+    parser.add_argument("urls", nargs="+", help="Video links")
+    parser.add_argument("--out", default="~/Downloads", help="Destination folder (default ~/Downloads)")
+    parser.add_argument("--audio-only", action="store_true", help="Audio only, to transcribe it")
     return parser.parse_args()
 
 
@@ -129,17 +129,17 @@ def main() -> int:
         try:
             if platform is None:
                 supported = ", ".join(sorted(set(PLATFORMS.values())))
-                raise RuntimeError(f"Plataforma no suportada. Suportades: {supported}")
+                raise RuntimeError(f"Unsupported platform. Supported: {supported}")
             url = clean_url(raw)
             result["platform"] = platform
-            log(f"Descarregant de {platform}: {url}")
+            log(f"Downloading from {platform}: {url}")
             result.update(download(url, out_dir, args.audio_only))
             result["status"] = "ok"
-        except Exception as e:  # noqa: BLE001 - informem de qualsevol error per URL
+        except Exception as e:  # noqa: BLE001 - report any error per URL
             failures += 1
             msg = str(e)
             if any(hint in msg.lower() for hint in LOGIN_HINTS):
-                msg = f"Aquest contingut demana iniciar sessió o és privat; només es poden baixar vídeos públics. ({msg})"
+                msg = f"This content requires login or is private; only public videos can be downloaded. ({msg})"
             result.update(status="error", error=msg[:500])
             log(f"  ERROR: {msg}")
         print(json.dumps(result, ensure_ascii=False), flush=True)

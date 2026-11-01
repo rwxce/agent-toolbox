@@ -1,93 +1,94 @@
 ---
 name: transcribe
 description: >-
-  Transcriu àudio o vídeo a text en local amb faster-whisper (sense API). Usa-la
-  quan l'usuari demani transcriure, "passar a text", treure el text d'una
-  reunió, nota de veu, podcast o vídeo, I TAMBÉ quan adjunti o enganxi
-  directament un fitxer .m4a/.mp3/.mp4/.ogg/.opus/.wav/.webm/.mov sense cap
-  altra instrucció (p. ex. un adjunt a .context/attachments/...). També
-  transcriu enllaços de xarxes socials (Instagram, X/Twitter, YouTube): baixa
-  l'àudio en temporal amb la skill `download` i l'esborra en acabar.
+  Transcribes audio or video to text locally with faster-whisper (no API). Use
+  it when the user asks to transcribe, "turn into text" ("transcriu", "passar a
+  text"), get the text of a meeting, voice note, podcast or video, AND ALSO when
+  they attach or paste an .m4a/.mp3/.mp4/.ogg/.opus/.wav/.webm/.mov file with no
+  other instruction (e.g. an attachment in .context/attachments/...). It also
+  transcribes social media links (Instagram, X/Twitter, YouTube): it downloads
+  the audio to a temporary folder with the `download` skill and deletes it when
+  done.
 ---
-# Transcriure àudio/vídeo
+# Transcribe audio/video
 
-Script: `scripts/transcribe.py` (dins d'aquesta carpeta de skill). S'executa amb
-`uv run`, que instal·la les dependències automàticament (PEP 723).
+Script: `scripts/transcribe.py` (inside this skill folder). Run it with
+`uv run`, which installs the dependencies automatically (PEP 723).
 
-Resultat esperat: **el text final al xat, sense deixar cap fitxer**, i l'àudio
-original a la Paperera de macOS (o, si era un enllaç, la descàrrega temporal
-esborrada).
+Expected outcome: **the final text in the chat, leaving no files behind**, and
+the original audio in the macOS Trash (or, for a link, the temporary download
+deleted).
 
-## Passos
+## Steps
 
-1. **Resol el fitxer**: ruta que doni l'usuari o adjunt. Posa sempre les rutes
-   entre cometes (sovint tenen espais i accents).
-   - **Si és un enllaç** de xarxes socials, baixa només l'àudio a una carpeta
-     temporal amb l'script de la skill `download` (germana d'aquesta):
+1. **Resolve the file**: path given by the user, or an attachment. Always quote
+   paths (they often contain spaces and accents).
+   - **If it is a social media link**, download only the audio to a temporary
+     folder with the sibling `download` skill's script:
 
      ```bash
      tmp=$(mktemp -d)
-     uv run "<carpeta de skills>/download/scripts/download.py" "<url>" \
+     uv run "<skills folder>/download/scripts/download.py" "<url>" \
        --audio-only --out "$tmp"
      ```
 
-     Fes servir el `path` del JSON com a fitxer i ofereix el `uploader` i el
-     `title` com a context. Sense `--trash-source`: en acabar (també si falla),
-     esborra la carpeta amb `rm -rf "$tmp"`. Si la descàrrega dona `error`,
-     explica'l i atura't.
-2. **Pregunta abans de transcriure**, totes les preguntes de cop (amb l'eina de
-   preguntes si n'hi ha; si no, en un sol missatge). No tornis a preguntar el
-   que l'usuari ja hagi dit.
-   - **Idioma**: Català (`ca`) / Castellà (`es`) / Barreja català-castellà
-     (`multi`) / Anglès (`en`).
-   - **Qualitat**: `medium` (per defecte) / `large-v3` (més precís, més lent) /
-     `small` (més ràpid).
-   - **Context** (opcional): noms de persones, empreses, sigles, tema. Millora
-     molt l'ortografia dels noms propis.
-3. **Executa** (en segon pla si l'àudio és llarg; `medium` en CPU va
-   aproximadament a temps real):
+     Use the JSON `path` as the file and offer the `uploader` and `title` as
+     context. No `--trash-source`: when done (also on failure), delete the
+     folder with `rm -rf "$tmp"`. If the download returns `error`, explain it
+     and stop.
+2. **Ask before transcribing**, all questions at once (with the question tool if
+   available; otherwise in a single message), in Catalan. Don't re-ask what the
+   user already said.
+   - **Language**: Catalan (`ca`) / Spanish (`es`) / Catalan-Spanish mix
+     (`multi`) / English (`en`).
+   - **Quality**: `medium` (default) / `large-v3` (more accurate, slower) /
+     `small` (faster).
+   - **Context** (optional): names of people, companies, acronyms, topic.
+     Greatly improves the spelling of proper nouns.
+3. **Run** (in the background if the audio is long; `medium` on CPU runs at
+   roughly real time):
 
    ```bash
-   uv run "<carpeta d'aquesta skill>/scripts/transcribe.py" "<fitxer>" \
+   uv run "<this skill's folder>/scripts/transcribe.py" "<file>" \
      --print --trash-source --lang <ca|es|multi|en> --model <model> \
      [--prompt "<context>"]
    ```
 
-   - `--print`: no escriu cap fitxer; el text arriba al JSON de stdout.
-   - `--trash-source`: si ha anat bé, l'original va a la Paperera (i la carpeta
-     de l'adjunt s'esborra si queda buida).
-   - Si cal convertir el fitxer, l'script ho fa en una carpeta temporal que
-     s'esborra sola.
-   - El primer cop es descarrega el model a `~/.cache/huggingface`. Avisa'n.
-4. **Llegeix el resultat**: una línia JSON per fitxer
-   `{src, status, text, language, duration, trashed}` (o `error`). El progrés
-   va a stderr.
-5. **Respon** amb el **text sencer** al xat, en paràgrafs llegibles (no
-   n'inventis ni en corregeixis el contingut), precedit de la durada. Posa la
-   transcripció **dins d'un bloc de codi** (tanca amb ```text) perquè es pugui
-   copiar d'un clic; res de la transcripció fora del bloc. Digues que
-   l'original és a la Paperera (o, si era un enllaç, que la descàrrega
-   temporal s'ha esborrat). Si hi ha `error`, explica'l: l'original no
-   s'ha esborrat.
-6. **Resum** (sempre): després del text sencer, afegeix
-   una secció `## Resum`, concisa però ben explicada, pensada per saber què cal
-   fer. Basa't només en el que diu l'àudio; no inventis res.
-   - **De què va**: 1-2 frases.
-   - **Punts clau**: llista curta.
-   - **Diagrama**: Mermaid `flowchart LR` de 3-6 caixes amb el flux, procés o
-     decisions principals. Etiquetes en llenguatge planer (sense jerga), amb una
-     nota curta amb `<br/>` només on importi. Si cal detall entre actors, un
-     `sequenceDiagram` de 3-4 missatges com a màxim. Si no hi ha cap flux a
-     dibuixar, una línia que ho expliqui en lloc d'un diagrama buit.
-   - **Què cal fer**: llista ordenada d'accions concretes, amb responsable i
-     termini si es mencionen.
+   - `--print`: writes no file; the text arrives in the stdout JSON.
+   - `--trash-source`: on success the original goes to the Trash (and the
+     attachment folder is deleted if left empty).
+   - If the file needs converting, the script does it in a temporary folder
+     that is deleted automatically.
+   - The first run downloads the model to `~/.cache/huggingface`. Warn the user.
+4. **Read the result**: one JSON line per file
+   `{src, status, text, language, duration, trashed}` (or `error`). Progress
+   goes to stderr.
+5. **Reply** with the **full text** in the chat, in readable paragraphs (don't
+   invent or correct the content), preceded by the duration. Put the
+   transcript **inside a code block** (close with ```text) so it can be copied
+   in one click; nothing of the transcript outside the block. Say the original
+   is in the Trash (or, for a link, that the temporary download was deleted).
+   If there is an `error`, explain it: the original was not deleted.
+6. **Summary** (always): after the full text, add a `## Resum` section, concise
+   but well explained, meant to tell what needs to be done. Base it only on
+   what the audio says; invent nothing.
+   - **What it is about**: 1-2 sentences.
+   - **Key points**: short list.
+   - **Diagram**: Mermaid `flowchart LR` with 3-6 boxes showing the main flow,
+     process or decisions. Plain-language labels (no jargon), with a short
+     `<br/>` note only where it matters. If detail between actors is needed, a
+     `sequenceDiagram` with at most 3-4 messages. If there is no flow to draw,
+     one line saying so instead of an empty diagram.
+   - **What to do**: ordered list of concrete actions, with owner and deadline
+     if mentioned.
 
-## Ús manual (sense agent)
+## Manual use (without an agent)
 
-Sense `--print`, desa `.txt`/`.srt` al costat de l'original (`--format txt,srt`,
-`--out <carpeta>`); `--to-mp3` desa també una còpia en mp3 (requereix `ffmpeg`).
+Without `--print`, it saves `.txt`/`.srt` next to the original
+(`--format txt,srt`, `--out <folder>`); `--to-mp3` also saves an mp3 copy
+(requires `ffmpeg`).
 
-## Errors habituals
+## Common errors
 
-- `uv` no trobat → `brew install uv`.
-- `ffmpeg` no trobat → `brew install ffmpeg`.
+- `uv` not found → `brew install uv`.
+- `ffmpeg` not found → `brew install ffmpeg`.

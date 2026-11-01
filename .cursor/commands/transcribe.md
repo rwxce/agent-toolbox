@@ -1,10 +1,10 @@
 ---
-description: Transcriu àudio/vídeo (fitxer o enllaç de xarxes) a text en local (faster-whisper)
+description: Transcribe audio/video (file or social media link) to text locally (faster-whisper)
 ---
-Transcriu el(s) fitxer(s) següent(s) seguint la skill `transcribe`:
+Transcribe the following file(s) following the `transcribe` skill:
 
 $ARGUMENTS
 
-Si és un enllaç de xarxes socials (Instagram, X/Twitter, YouTube), baixa'n l'àudio en temporal tal com diu la skill i esborra'l en acabar.
+If it is a social media link (Instagram, X/Twitter, YouTube), download its audio to a temporary folder as the skill describes and delete it when done.
 
-Si no hi ha cap fitxer ni enllaç als arguments ni adjunt al missatge, pregunta quin fitxer vol transcriure. Abans de transcriure, fes les preguntes de la skill (idioma, qualitat, context), excepte les que l'usuari ja hagi respost als arguments. Al final, dona el text sencer al xat dins d'un bloc de codi copiable d'un clic i, a continuació, sempre el resum (de què va, punts clau, diagrama i què cal fer) segons la skill. No desis cap fitxer i envia l'original a la Paperera (si era un enllaç, esborra la descàrrega temporal).
+If there is no file or link in the arguments or attached to the message, ask which file to transcribe. Before transcribing, ask the skill's questions (language, quality, context), except those the user already answered in the arguments. At the end, give the full text in the chat inside a one-click copyable code block and, right after, always the summary (what it is about, key points, diagram and actions) as per the skill. Do not save any file and send the original to the Trash (if it was a link, delete the temporary download). Reply to the user in Catalan.
